@@ -1,0 +1,29 @@
+language: node_js
+node_js:
+  - "node" # always use the latest; we are only using it as a test runner for now
+cache: npm
+
+services:
+- docker
+
+jobs:
+  include:
+    - stage: Tests
+      name: lint
+      script: npm run lint
+
+    - name: unit tests
+      script: make test
+
+    # Run make dist and build-image _without_ pushing results, if no tag
+    - name: dist
+      script: make dist build-image
+      if: tag IS blank
+
+    # Run make dist and push stuff
+    - stage: Deploy
+      script:
+        # build and publish
+        - make dist build-image
+        - ./bin/run-release.sh $TRAVIS_TAG
+      if: tag IS present

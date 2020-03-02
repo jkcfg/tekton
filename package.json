@@ -1,0 +1,67 @@
+{
+  "name": "@jkcfg/tekton",
+  "version": "0.0.1",
+  "author": "The jk Authors",
+  "bugs": {
+    "url": "https://github.com/jkcfg/tekton/issues"
+  },
+  "dependencies": {
+    "@jkcfg/std": "^0.3.2"
+  },
+  "description": "jk Tekton library",
+  "devDependencies": {
+    "babel-jest": "^23.6.0",
+    "babel-preset-env": "^1.7.0",
+    "eslint": "^5.10.0",
+    "eslint-config-airbnb-base": "^13.1.0",
+    "eslint-plugin-import": "^2.14.0",
+    "jest": "^23.6.0",
+    "ts-jest": "^23.10.5",
+    "typescript": "^3.2.2",
+    "handlebars": "^4.1.1"
+  },
+  "homepage": "https://github.com/jkcfg/tekton#readme",
+  "keywords": [
+    "configuration",
+    "code",
+    "generation",
+    "kubernetes",
+    "tekton",
+    "tekton-pipeline"
+  ],
+  "license": "Apache-2.0",
+  "module": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jkcfg/tekton.git"
+  },
+  "scripts": {
+    "build": "make",
+    "lint": "eslint src",
+    "test": "jest"
+  },
+  "jest": {
+    "preset": "ts-jest/presets/js-with-babel",
+    "globals": {
+      "ts-jest": {
+        "diagnostics": {
+          "ignoreCodes": [
+            151001
+          ]
+        }
+      }
+    },
+    "testMatch": [
+      "<rootDir>/tests/*.test.js"
+    ],
+    "transformIgnorePatterns": [
+      "<rootDir>/@jkcfg/"
+    ],
+    "modulePathIgnorePatterns": [
+      "<rootDir>/@jkcfg/"
+    ],
+    "moduleDirectories": [
+      "<rootDir>/node_modules"
+    ]
+  }
+}
