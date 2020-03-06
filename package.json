@@ -13,13 +13,15 @@
   "devDependencies": {
     "babel-jest": "^23.6.0",
     "babel-preset-env": "^1.7.0",
+    "@typescript-eslint/eslint-plugin": "^1.7.0",
+    "@typescript-eslint/parser": "^2.22.0",
     "eslint": "^5.10.0",
     "eslint-config-airbnb-base": "^13.1.0",
-    "eslint-plugin-import": "^2.14.0",
+    "eslint-plugin-import": "^2.17.2",
+    "eslint-plugin-jest": "^23.0.4",
     "jest": "^23.6.0",
     "ts-jest": "^23.10.5",
-    "typescript": "^3.2.2",
-    "handlebars": "^4.1.1"
+    "typescript": "^3.2.2"
   },
   "homepage": "https://github.com/jkcfg/tekton#readme",
   "keywords": [
@@ -38,7 +40,7 @@
   },
   "scripts": {
     "build": "make",
-    "lint": "eslint src",
+    "lint": "eslint src/",
     "test": "jest"
   },
   "jest": {
