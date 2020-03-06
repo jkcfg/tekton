@@ -6,6 +6,7 @@
     "url": "https://github.com/jkcfg/tekton/issues"
   },
   "dependencies": {
+    "@jkcfg/kubernetes": "^0.6.0",
     "@jkcfg/std": "^0.3.2"
   },
   "description": "jk Tekton library",
