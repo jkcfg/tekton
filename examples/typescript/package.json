@@ -1,0 +1,19 @@
+{
+  "name": "tekton-typescript-example",
+  "version": "0.1.0",
+  "description": "Example of using @jkcfg/tekton with TypeScript",
+  "dependencies": {
+    "@jkcfg/kubernetes": "",
+    "@jkcfg/tekton": ""
+  },
+  "devDependencies": {
+    "typescript": "^3.8.3"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "npx tsc -m es6 ./pipeline.ts --moduleResolution node",
+    "generate": "jk generate --stdout ./pipeline.js"
+  },
+  "author": "",
+  "license": "ISC"
+}
