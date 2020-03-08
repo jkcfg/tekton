@@ -3,13 +3,13 @@
 Types to represent Tekton resources.
 
 This file is constructed by hand, by taking the Go type definitions
-from github.com/tektoncd/pipeline/pkg/apis/pipeline[/v1alpha2] and
+from github.com/tektoncd/pipeline/pkg/apis/{pipeline,resource} and
 transliterating them to TypeScript.
 
  - `type Foo struct` in Go ends up as TypeScript `class Foo`
 
- - each class property is given the name given for its JSON encoding
-   in its Go struct tag
+ - each class property has the name given for its JSON encoding in its
+   Go struct tag, since these properties will be encoded directly
 
  - if a struct field is marked `optional` in a comment, it's nullable
    here
@@ -34,6 +34,16 @@ transliterating them to TypeScript.
    configuration. There may arise use cases for e.g., processing a
    status with `jk`, in which case I will have to overcome my
    laziness.
+
+
+Top-level objects (those with meta.v1.ObjectMeta) get a constructor
+taking a name, then the fields as one big object; e.g.,
+
+    const p = new Pipeline('foo', { spec: ... });
+
+Other objects just get the fields:
+
+    const s = new PipelineSpec({ tasks: [ ... ] });
 
 */
 
@@ -86,8 +96,14 @@ export namespace tekton /* tekton.dev */ {
     export class PipelineResource {
       readonly apiVersion: string = version;
       readonly kind: string = "PipelineResource";
+      metadata?: meta.v1.ObjectMeta;
       spec: PipelineResourceSpec;
       // omitted: status, which is decrecated anyway
+
+      constructor(name: string, fields?: Partial<PipelineResource>) {
+        Object.assign(this, fields);
+        this.metadata = Object.assign(this.metadata || {}, { name });
+      }
     }
 
     // https://github.com/tektoncd/pipeline/blob/v0.11.0-rc1/pkg/apis/resource/v1alpha1/pipeline_resource_types.go#L95
@@ -95,6 +111,10 @@ export namespace tekton /* tekton.dev */ {
       type: PipelineResourceType;
       params: ResourceParam[];
       secretParams?: SecretParam[];
+
+      constructor(fields?: Partial<PipelineResourceSpec>) {
+        Object.assign(this, fields);
+      }
     }
 
     // https://github.com/tektoncd/pipeline/blob/v0.11.0-rc1/pkg/apis/resource/v1alpha1/pipeline_resource_types.go#L104
@@ -102,6 +122,11 @@ export namespace tekton /* tekton.dev */ {
       fileName: string;
       secretKey: string;
       secretName: string;
+
+      constructor(fields?: Partial<PipelineResource>) {
+        Object.assign(this, fields);
+      }
+
     }
 
     // https://github.com/tektoncd/pipeline/blob/v0.11.0-rc1/pkg/apis/resource/v1alpha1/pipeline_resource_types.go#L112
@@ -136,13 +161,14 @@ export namespace tekton /* tekton.dev */ {
     export class ClusterTask {
       readonly apiVersion: string = version;
       readonly kind: string = "ClusterTask";
+      metadata?: meta.v1.ObjectMeta;
       spec?: TaskSpec;
     }
 
     export class ClusterTaskList {
       readonly apiVersion: string = version;
       readonly kind: string = "ClusterTaskList";
-      meta?: meta.v1.ListMeta;
+      metadata?: meta.v1.ListMeta;
       items: ClusterTask[];
     }
 
@@ -177,6 +203,11 @@ export namespace tekton /* tekton.dev */ {
       metadata?: meta.v1.ObjectMeta;
       spec?: PipelineSpec;
       // omitted: status is deprecated
+
+      constructor(name: string, fields?: Partial<Pipeline>) {
+        Object.assign(this, fields);
+        this.metadata = Object.assign(this.metadata || {}, { name });
+      }
     }
 
     // https://github.com/tektoncd/pipeline/blob/v0.11.0-rc1/pkg/apis/pipeline/v1beta1/pipeline_types.go#L67
@@ -184,6 +215,10 @@ export namespace tekton /* tekton.dev */ {
       resources?: PipelineDeclaredResource[];
       tasks?: PipelineTask[];
       params?: ParamSpec[];
+
+      constructor(fields?: Partial<PipelineSpec>) {
+        Object.assign(this, fields);
+      }
     }
 
     // https://github.com/tektoncd/pipeline/blob/v0.11.0-rc1/pkg/apis/pipeline/v1beta1/pipeline_types.go#L80
@@ -193,7 +228,7 @@ export namespace tekton /* tekton.dev */ {
       taskSpec?: TaskSpec; // ) one or other
       conditions?: PipelineTaskCondition[];
       retries?: number;
-      runAfter: string[];
+      runAfter?: string[];
       resources?: PipelineTaskResources;
       params?: Param[];
     }
@@ -367,6 +402,11 @@ export namespace tekton /* tekton.dev */ {
       readonly kind: string = "Task";
       metadata?: meta.v1.ObjectMeta;
       spec?: TaskSpec;
+
+      constructor(name: string, fields?: Partial<Task>) {
+        Object.assign(this, fields);
+        this.metadata = Object.assign(this.metadata || {}, { name });
+      }
     }
 
     // https://github.com/tektoncd/pipeline/blob/v0.11.0-rc1/pkg/apis/pipeline/v1beta1/task_types.go#L57
@@ -379,6 +419,10 @@ export namespace tekton /* tekton.dev */ {
       sidecars?: Sidecar[];
       workspaces?: WorkspaceDeclaration[];
       results?: TaskResult[];
+
+      constructor(fields?: Partial<TaskSpec>) {
+        Object.assign(this, fields);
+      }
     }
 
     // https://github.com/tektoncd/pipeline/blob/v0.11.0-rc1/pkg/apis/pipeline/v1beta1/task_types.go#L94
