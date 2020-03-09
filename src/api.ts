@@ -35,15 +35,21 @@ transliterating them to TypeScript.
    status with `jk`, in which case I will have to overcome my
    laziness.
 
-
 Top-level objects (those with meta.v1.ObjectMeta) get a constructor
 taking a name, then the fields as one big object; e.g.,
 
     const p = new Pipeline('foo', { spec: ... });
 
-Other objects just get the fields:
+Other objects just get the fields argument:
 
     const s = new PipelineSpec({ tasks: [ ... ] });
+
+There's a fair few classes that are just `{ name, value }`; those get
+a constructor with arguments for the mandatory fields. I have not done
+this everywhere -- just where the fields are conventional, like a name
+and a value or a type.
+
+Lastly: List types get a constructor with an `items` argument.
 
 */
 
@@ -119,20 +125,14 @@ export namespace tekton /* tekton.dev */ {
 
     // https://github.com/tektoncd/pipeline/blob/v0.11.0-rc1/pkg/apis/resource/v1alpha1/pipeline_resource_types.go#L104
     export class SecretParam {
-      fileName: string;
-      secretKey: string;
-      secretName: string;
-
-      constructor(fields?: Partial<PipelineResource>) {
-        Object.assign(this, fields);
-      }
-
+      constructor(public fileName: string,
+                  public secretKey: string,
+                  public secretName: string) {}
     }
 
     // https://github.com/tektoncd/pipeline/blob/v0.11.0-rc1/pkg/apis/resource/v1alpha1/pipeline_resource_types.go#L112
     export class ResourceParam {
-      name: string;
-      value: string;
+      constructor(public name: string, public value: string) {}
     }
 
     // https://github.com/tektoncd/pipeline/blob/v0.11.0-rc1/pkg/apis/resource/v1alpha1/pipeline_resource_types.go#L122
@@ -142,6 +142,10 @@ export namespace tekton /* tekton.dev */ {
       description?: string;
       targetPath?: string;
       optional?: boolean = false;
+
+      constructor(fields?: Partial<ResourceDeclaration>) {
+        Object.assign(this, fields);
+      }
     }
 
     // https://github.com/tektoncd/pipeline/blob/v0.11.0-rc1/pkg/apis/resource/v1alpha1/pipeline_resource_types.go#L147
@@ -149,7 +153,8 @@ export namespace tekton /* tekton.dev */ {
       readonly apiVersion: string = version;
       readonly kind: string = "PipelineResourceList";
       metadata?: meta.v1.ListMeta;
-      items: PipelineResource[];
+
+      constructor(public items: PipelineResource[]) {}
     }
 
     // Now to the main event: most of the types are in
@@ -163,13 +168,19 @@ export namespace tekton /* tekton.dev */ {
       readonly kind: string = "ClusterTask";
       metadata?: meta.v1.ObjectMeta;
       spec?: TaskSpec;
+
+      constructor(name: string, fields?: Partial<ClusterTask>) {
+        Object.assign(this, fields);
+        this.metadata = Object.assign(this.metadata || {}, { name });
+      }
     }
 
     export class ClusterTaskList {
       readonly apiVersion: string = version;
       readonly kind: string = "ClusterTaskList";
       metadata?: meta.v1.ListMeta;
-      items: ClusterTask[];
+
+      constructor(public items: ClusterTask[]) {}
     }
 
     // Param types
@@ -186,12 +197,15 @@ export namespace tekton /* tekton.dev */ {
       type?: ParamType = ParamType.String;
       description?: string;
       default?: string | string[];
+
+      constructor(fields?: Partial<ParamSpec>) {
+        Object.assign(this, fields);
+      }
     }
 
     // https://github.com/tektoncd/pipeline/blob/v0.11.0-rc1/pkg/apis/pipeline/v1beta1/param_types.go#L65
     export class Param {
-      name: string;
-      value: string | string[];
+      constructor(public name: string, public value: string | string[]) {}
     }
 
     // Pipelines (pipeline_types.go)
@@ -231,6 +245,13 @@ export namespace tekton /* tekton.dev */ {
       runAfter?: string[];
       resources?: PipelineTaskResources;
       params?: Param[];
+
+      constructor(fields?: Partial<PipelineTask>) {
+        if (fields && fields.taskRef && fields.taskSpec) {
+          throw new Error('cannot construct a PipelineTask with both taskRef and taskSpec; pick one');
+        }
+        Object.assign(this, fields);
+      }
     }
 
     // omitted: PipelineTaskParam, which doesn't appear to be used
@@ -240,18 +261,25 @@ export namespace tekton /* tekton.dev */ {
       conditionRef: string;
       params?: Param[];
       resources?: PipelineTaskInputResource[];
+
+      constructor(fields?: Partial<PipelineTaskCondition>) {
+        Object.assign(this, fields);
+      }
     }
 
     // https://github.com/tektoncd/pipeline/blob/v0.11.0-rc1/pkg/apis/pipeline/v1beta1/pipeline_types.go#L170
     export class PipelineDeclaredResource {
-      name: string;
-      type: PipelineResourceType;
+      constructor(public name: string, public type: PipelineResourceType) {}
     }
 
     // https://github.com/tektoncd/pipeline/blob/v0.11.0-rc1/pkg/apis/pipeline/v1beta1/pipeline_types.go#L182
     export class PipelineTaskResources {
       inputs?: PipelineTaskInputResource[];
       outputs?: PipelineTaskOutputResource[];
+
+      constructor(fields?: Partial<PipelineTaskResources>) {
+        Object.assign(this, fields);
+      }
     }
 
     // https://github.com/tektoncd/pipeline/blob/v0.11.0-rc1/pkg/apis/pipeline/v1beta1/pipeline_types.go#L194
@@ -259,12 +287,20 @@ export namespace tekton /* tekton.dev */ {
       name: string;
       resource: string;
       from?: string[];
+
+      constructor(fields?: Partial<PipelineTaskInputResource>) {
+        Object.assign(this, fields);
+      }
     }
 
     // https://github.com/tektoncd/pipeline/blob/v0.11.0-rc1/pkg/apis/pipeline/v1beta1/pipeline_types.go#L208
     export class PipelineTaskOutputResource {
       name: string;
       resource: string;
+
+      constructor(fields?: Partial<PipelineTaskOutputResource>) {
+        Object.assign(this, fields);
+      }
     }
 
     // https://github.com/tektoncd/pipeline/blob/v0.11.0-rc1/pkg/apis/pipeline/v1beta1/pipeline_types.go#L217
@@ -272,7 +308,8 @@ export namespace tekton /* tekton.dev */ {
       readonly apiVersion: string = version;
       readonly kind: string = "PipelineList";
       metadata?: meta.v1.ListMeta;
-      items: Pipeline[];
+
+      constructor(public items: Pipeline[]) {}
     }
 
     // PipelineRun types (pipelinerun_types.go)
@@ -281,9 +318,14 @@ export namespace tekton /* tekton.dev */ {
     export class PipelineRun {
       readonly apiVersion: string = version;
       readonly kind: string = "PipelineRun";
-      meta?: meta.v1.ObjectMeta;
+      metadata?: meta.v1.ObjectMeta;
       spec?: PipelineRunSpec;
       // omitted: status
+
+      constructor(name: string, fields?: Partial<PipelineRun>) {
+        Object.assign(this, fields);
+        this.metadata = Object.assign(this.metadata || {}, { name });
+      }
     }
 
     // https://github.com/tektoncd/pipeline/blob/v0.11.0-rc1/pkg/apis/pipeline/v1beta1/pipelinerun_types.go#L130
@@ -297,6 +339,10 @@ export namespace tekton /* tekton.dev */ {
       timeout?: Duration;
       podTemplate?: PodTemplate;
       workspaces?: WorkspaceBinding[];
+
+      constructor(fields?: Partial<PipelineRunSpec>) {
+        Object.assign(this, fields);
+      }
     }
 
     // Omitted:
@@ -308,14 +354,21 @@ export namespace tekton /* tekton.dev */ {
 
     // https://github.com/tektoncd/pipeline/blob/v0.11.0-rc1/pkg/apis/pipeline/v1beta1/pipelinerun_types.go#L171
     export class PipelineRef {
-      name: string;
-      apiVersion: string;
+      constructor(public name: string, fields?: Partial<PipelineRef>) {
+        Object.assign(this, fields);
+      }
+
+      apiVersion?: string;
     }
 
     // https://github.com/tektoncd/pipeline/blob/v0.11.0-rc1/pkg/apis/pipeline/v1beta1/pipelinerun_types.go#L265
     export class PipelineRunSpecServiceAccountName {
       taskName: string;
       serviceAccountName: string;
+
+      constructor(fields?: Partial<PipelineRunSpecServiceAccountName>) {
+        Object.assign(this, fields);
+      }
     }
 
     // https://github.com/tektoncd/pipeline/blob/v0.11.0-rc1/pkg/apis/pipeline/v1beta1/pipelinerun_types.go#L273
@@ -323,7 +376,7 @@ export namespace tekton /* tekton.dev */ {
       readonly apiVersion: string = version;
       readonly kind: string = "PipelineRunList";
       meta?: meta.v1.ListMeta;
-      items: PipelineRun[];
+      constructor(public items: PipelineRun[]) {}
     }
 
     // omitted: PipelineTaskRun (it's status thing?)
@@ -347,6 +400,10 @@ export namespace tekton /* tekton.dev */ {
       enableServiceLinks?: boolean;
       priorityClassName?: string;
       schedulerName?: string;
+
+      constructor(fields?: Partial<PodTemplate>) {
+        Object.assign(this, fields);
+      }
     }
 
     // Resource types (resource_types.go)
@@ -365,12 +422,20 @@ export namespace tekton /* tekton.dev */ {
     export class TaskResources {
       inputs?: TaskResource[];
       outputs?: TaskResource[];
+
+      constructor(fields?: Partial<TaskResources>) {
+        Object.assign(this, fields);
+      }
     }
 
     // https://github.com/tektoncd/pipeline/blob/v0.11.0-rc1/pkg/apis/pipeline/v1beta1/resource_types.go#L80
     export class TaskRunResources {
       inputs?: TaskResourceBinding[];
       outputs?: TaskResourceBinding[];
+
+      constructor(fields?: Partial<TaskRunResources>) {
+        Object.assign(this, fields);
+      }
     }
 
     // https://github.com/tektoncd/pipeline/blob/v0.11.0-rc1/pkg/apis/pipeline/v1beta1/resource_types.go#L96
@@ -378,6 +443,13 @@ export namespace tekton /* tekton.dev */ {
       name: string;
       resourceRef?: PipelineResourceRef;   // )
       resourceSpec?: PipelineResourceSpec; // ) one or other
+
+      constructor(fields?: Partial<PipelineResourceBinding>) {
+        if (fields && fields.resourceRef && fields.resourceSpec) {
+          throw new Error('cannot construct a PipelineResourceBinding with both resourceRef and resourceSpec; pick one');
+        }
+        Object.assign(this, fields);
+      }
     }
 
     // https://github.com/tektoncd/pipeline/blob/v0.11.0-rc1/pkg/apis/pipeline/v1beta1/resource_types.go#L111
@@ -386,11 +458,18 @@ export namespace tekton /* tekton.dev */ {
       value: string;
       resourceRef: PipelineResourceRef;
       resultType: string; // typed in Go as `type ResultType string`
+
+      constructor(fields?: Partial<PipelineResourceResult>) {
+        Object.assign(this, fields);
+      }
     }
 
     // https://github.com/tektoncd/pipeline/blob/v0.11.0-rc1/pkg/apis/pipeline/v1beta1/resource_types.go#L122
     export class PipelineResourceRef {
-      name: string;
+      constructor(public name: string, fields?: Partial<PipelineResourceRef>) {
+        Object.assign(this, fields);
+      }
+
       apiVersion?: string;
     }
 
@@ -427,13 +506,21 @@ export namespace tekton /* tekton.dev */ {
 
     // https://github.com/tektoncd/pipeline/blob/v0.11.0-rc1/pkg/apis/pipeline/v1beta1/task_types.go#L94
     export class TaskResult {
-      name: string;
+      constructor(public name: string, fields?: Partial<TaskResult>) {
+        Object.assign(this, fields);
+      }
+
       description?: string;
     }
 
     // https://github.com/tektoncd/pipeline/blob/v0.11.0-rc1/pkg/apis/pipeline/v1beta1/task_types.go#L105
     export class Step extends core.v1.Container {
       script?: string;
+
+      constructor(fields?: Partial<Step>) {
+        super();
+        Object.assign(this, fields);
+      }
     }
 
     // https://github.com/tektoncd/pipeline/blob/v0.11.0-rc1/pkg/apis/pipeline/v1beta1/task_types.go#L115
@@ -443,8 +530,9 @@ export namespace tekton /* tekton.dev */ {
     export class TaskList {
       readonly apiVersion: string = version;
       readonly kind: string = "TaskList";
-      meta: meta.v1.ListMeta;
-      items: Task[];
+      metadata: meta.v1.ListMeta;
+
+      constructor(public items: Task[]) {}
     }
 
     export enum TaskKind {
@@ -457,6 +545,10 @@ export namespace tekton /* tekton.dev */ {
       name: string;
       kind: TaskKind;
       apiVersion?: string;
+
+      constructor(fields?: Partial<TaskRef>) {
+        Object.assign(this, fields);
+      }
     }
 
     // TaskRun types (taskrun_types.go)
@@ -471,6 +563,10 @@ export namespace tekton /* tekton.dev */ {
       timeout?: Duration;
       podTemplate: PodTemplate;
       workspaces?: WorkspaceBinding[];
+
+      constructor(fields?: Partial<TaskRunSpec>) {
+        Object.assign(this, fields);
+      }
     }
 
     // https://github.com/tektoncd/pipeline/blob/v0.11.0-rc1/pkg/apis/pipeline/v1beta1/taskrun_types.go#L59
@@ -480,17 +576,30 @@ export namespace tekton /* tekton.dev */ {
     export class TaskRunImports {
       resources?: TaskResourceBinding[];
       params?: Param[];
+
+      constructor(fields?: Partial<TaskRunImports>) {
+        Object.assign(this, fields);
+      }
     }
 
     // https://github.com/tektoncd/pipeline/blob/v0.11.0-rc1/pkg/apis/pipeline/v1beta1/taskrun_types.go#L77
     // embeds PipelineResourceBinding
     export class TaskResourceBinding extends PipelineResourceBinding {
       paths?: string[]; // due to be removed
+
+      constructor(fields?: Partial<PipelineResourceBinding>) {
+        super();
+        Object.assign(this, fields);
+      }
     }
 
     // https://github.com/tektoncd/pipeline/blob/v0.11.0-rc1/pkg/apis/pipeline/v1beta1/taskrun_types.go#L87
     export class TaskRunOutputs {
       resources?: TaskResourceBinding[];
+
+      constructor(fields?: Partial<TaskRunOutputs>) {
+        Object.assign(this, fields);
+      }
     }
 
     // Omitted, because they pertain to runtime status (rather than
@@ -508,8 +617,14 @@ export namespace tekton /* tekton.dev */ {
     export class TaskRun {
       readonly apiVersion: string = version;
       readonly kind: string = "TaskRun";
+      metadata?: meta.v1.ObjectMeta;
       spec?: TaskRunSpec;
       // omitted: status
+
+      constructor(name: string, fields?: Partial<TaskRun>) {
+        Object.assign(this, fields);
+        this.metadata = Object.assign(this.metadata || {}, { name });
+      }
     }
 
     // https://github.com/tektoncd/pipeline/blob/v0.11.0-rc1/pkg/apis/pipeline/v1beta1/taskrun_types.go#L261
@@ -517,7 +632,8 @@ export namespace tekton /* tekton.dev */ {
       readonly apiVersion: string = version;
       readonly kind: string = "TaskRunList";
       metadata?: meta.v1.ListMeta;
-      items: TaskRun[];
+
+      constructor(public items: TaskRun[]) {}
     }
 
     // Workspace types (workspace_types.go)
@@ -528,6 +644,10 @@ export namespace tekton /* tekton.dev */ {
       description?: string;
       mountPath?: string;
       readOnly?: boolean;
+
+      constructor(fields?: Partial<WorkspaceDeclaration>) {
+        Object.assign(this, fields);
+      }
     }
 
     // https://github.com/tektoncd/pipeline/blob/v0.11.0-rc1/pkg/apis/pipeline/v1beta1/workspace_types.go#L51
@@ -538,18 +658,33 @@ export namespace tekton /* tekton.dev */ {
       emptyDir?: core.v1.EmptyDirVolumeSource;                           // ) one or other
       configMap?: core.v1.ConfigMapVolumeSource;
       secret?: core.v1.SecretVolumeSource;
+
+      constructor(fields?: Partial<WorkspaceBinding>) {
+        if (fields && fields.persistentVolumeClaim && fields.emptyDir) {
+          throw new Error('cannot construct WorkspaceBinding with both persistentVolumeClaim and emptyDir; pick one');
+        }
+        Object.assign(this, fields);
+      }
     }
 
     // https://github.com/tektoncd/pipeline/blob/v0.11.0-rc1/pkg/apis/pipeline/v1beta1/workspace_types.go#L77
     export class WorkspacePipelineDeclaration {
       name: string;
       description?: string;
+
+      constructor(fields?: Partial<WorkspacePipelineDeclaration>) {
+        Object.assign(this, fields);
+      }
     }
 
     // https://github.com/tektoncd/pipeline/blob/v0.11.0-rc1/pkg/apis/pipeline/v1beta1/workspace_types.go#L89
     export class WorkspacePipelineTaskBinding {
       name: string;
       workspace: string;
+
+      constructor(fields?: Partial<WorkspacePipelineTaskBinding>) {
+        Object.assign(this, fields);
+      }
     }
   }
 }

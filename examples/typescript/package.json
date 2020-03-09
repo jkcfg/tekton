@@ -4,7 +4,7 @@
   "description": "Example of using @jkcfg/tekton with TypeScript",
   "dependencies": {
     "@jkcfg/kubernetes": "",
-    "@jkcfg/tekton": ""
+    "@jkcfg/tekton": "file://../../@jkcfg/tekton"
   },
   "devDependencies": {
     "typescript": "^3.8.3"
