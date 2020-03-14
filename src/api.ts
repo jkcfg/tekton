@@ -106,7 +106,7 @@ export namespace tekton /* tekton.dev */ {
       spec: PipelineResourceSpec;
       // omitted: status, which is decrecated anyway
 
-      constructor(name: string, fields?: Partial<PipelineResource>) {
+      constructor(name: string, fields: PipelineResource) {
         Object.assign(this, fields);
         this.metadata = Object.assign(this.metadata || {}, { name });
       }
@@ -118,7 +118,7 @@ export namespace tekton /* tekton.dev */ {
       params: ResourceParam[];
       secretParams?: SecretParam[];
 
-      constructor(fields?: Partial<PipelineResourceSpec>) {
+      constructor(fields: PipelineResourceSpec) {
         Object.assign(this, fields);
       }
     }
@@ -143,7 +143,7 @@ export namespace tekton /* tekton.dev */ {
       targetPath?: string;
       optional?: boolean = false;
 
-      constructor(fields?: Partial<ResourceDeclaration>) {
+      constructor(fields: ResourceDeclaration) {
         Object.assign(this, fields);
       }
     }
@@ -169,7 +169,7 @@ export namespace tekton /* tekton.dev */ {
       metadata?: meta.v1.ObjectMeta;
       spec?: TaskSpec;
 
-      constructor(name: string, fields?: Partial<ClusterTask>) {
+      constructor(name: string, fields: ClusterTask) {
         Object.assign(this, fields);
         this.metadata = Object.assign(this.metadata || {}, { name });
       }
@@ -198,7 +198,7 @@ export namespace tekton /* tekton.dev */ {
       description?: string;
       default?: string | string[];
 
-      constructor(fields?: Partial<ParamSpec>) {
+      constructor(fields: ParamSpec) {
         Object.assign(this, fields);
       }
     }
@@ -218,7 +218,7 @@ export namespace tekton /* tekton.dev */ {
       spec?: PipelineSpec;
       // omitted: status is deprecated
 
-      constructor(name: string, fields?: Partial<Pipeline>) {
+      constructor(name: string, fields: Pipeline) {
         Object.assign(this, fields);
         this.metadata = Object.assign(this.metadata || {}, { name });
       }
@@ -230,7 +230,7 @@ export namespace tekton /* tekton.dev */ {
       tasks?: PipelineTask[];
       params?: ParamSpec[];
 
-      constructor(fields?: Partial<PipelineSpec>) {
+      constructor(fields: PipelineSpec) {
         Object.assign(this, fields);
       }
     }
@@ -246,7 +246,7 @@ export namespace tekton /* tekton.dev */ {
       resources?: PipelineTaskResources;
       params?: Param[];
 
-      constructor(fields?: Partial<PipelineTask>) {
+      constructor(fields: PipelineTask) {
         if (fields && fields.taskRef && fields.taskSpec) {
           throw new Error('cannot construct a PipelineTask with both taskRef and taskSpec; pick one');
         }
@@ -262,7 +262,7 @@ export namespace tekton /* tekton.dev */ {
       params?: Param[];
       resources?: PipelineTaskInputResource[];
 
-      constructor(fields?: Partial<PipelineTaskCondition>) {
+      constructor(fields: PipelineTaskCondition) {
         Object.assign(this, fields);
       }
     }
@@ -277,7 +277,7 @@ export namespace tekton /* tekton.dev */ {
       inputs?: PipelineTaskInputResource[];
       outputs?: PipelineTaskOutputResource[];
 
-      constructor(fields?: Partial<PipelineTaskResources>) {
+      constructor(fields: PipelineTaskResources) {
         Object.assign(this, fields);
       }
     }
@@ -288,7 +288,7 @@ export namespace tekton /* tekton.dev */ {
       resource: string;
       from?: string[];
 
-      constructor(fields?: Partial<PipelineTaskInputResource>) {
+      constructor(fields: PipelineTaskInputResource) {
         Object.assign(this, fields);
       }
     }
@@ -298,7 +298,7 @@ export namespace tekton /* tekton.dev */ {
       name: string;
       resource: string;
 
-      constructor(fields?: Partial<PipelineTaskOutputResource>) {
+      constructor(fields: PipelineTaskOutputResource) {
         Object.assign(this, fields);
       }
     }
@@ -322,7 +322,7 @@ export namespace tekton /* tekton.dev */ {
       spec?: PipelineRunSpec;
       // omitted: status
 
-      constructor(name: string, fields?: Partial<PipelineRun>) {
+      constructor(name: string, fields: PipelineRun) {
         Object.assign(this, fields);
         this.metadata = Object.assign(this.metadata || {}, { name });
       }
@@ -340,7 +340,7 @@ export namespace tekton /* tekton.dev */ {
       podTemplate?: PodTemplate;
       workspaces?: WorkspaceBinding[];
 
-      constructor(fields?: Partial<PipelineRunSpec>) {
+      constructor(fields: PipelineRunSpec) {
         Object.assign(this, fields);
       }
     }
@@ -354,11 +354,13 @@ export namespace tekton /* tekton.dev */ {
 
     // https://github.com/tektoncd/pipeline/blob/v0.11.0-rc1/pkg/apis/pipeline/v1beta1/pipelinerun_types.go#L171
     export class PipelineRef {
-      constructor(public name: string, fields?: Partial<PipelineRef>) {
+      name: string
+      apiVersion?: string;
+
+      constructor(fields: PipelineRef) {
         Object.assign(this, fields);
       }
 
-      apiVersion?: string;
     }
 
     // https://github.com/tektoncd/pipeline/blob/v0.11.0-rc1/pkg/apis/pipeline/v1beta1/pipelinerun_types.go#L265
@@ -366,7 +368,7 @@ export namespace tekton /* tekton.dev */ {
       taskName: string;
       serviceAccountName: string;
 
-      constructor(fields?: Partial<PipelineRunSpecServiceAccountName>) {
+      constructor(fields: PipelineRunSpecServiceAccountName) {
         Object.assign(this, fields);
       }
     }
@@ -401,7 +403,7 @@ export namespace tekton /* tekton.dev */ {
       priorityClassName?: string;
       schedulerName?: string;
 
-      constructor(fields?: Partial<PodTemplate>) {
+      constructor(fields: PodTemplate) {
         Object.assign(this, fields);
       }
     }
@@ -423,7 +425,7 @@ export namespace tekton /* tekton.dev */ {
       inputs?: TaskResource[];
       outputs?: TaskResource[];
 
-      constructor(fields?: Partial<TaskResources>) {
+      constructor(fields: TaskResources) {
         Object.assign(this, fields);
       }
     }
@@ -433,7 +435,7 @@ export namespace tekton /* tekton.dev */ {
       inputs?: TaskResourceBinding[];
       outputs?: TaskResourceBinding[];
 
-      constructor(fields?: Partial<TaskRunResources>) {
+      constructor(fields: TaskRunResources) {
         Object.assign(this, fields);
       }
     }
@@ -444,7 +446,7 @@ export namespace tekton /* tekton.dev */ {
       resourceRef?: PipelineResourceRef;   // )
       resourceSpec?: PipelineResourceSpec; // ) one or other
 
-      constructor(fields?: Partial<PipelineResourceBinding>) {
+      constructor(fields: PipelineResourceBinding) {
         if (fields && fields.resourceRef && fields.resourceSpec) {
           throw new Error('cannot construct a PipelineResourceBinding with both resourceRef and resourceSpec; pick one');
         }
@@ -459,18 +461,19 @@ export namespace tekton /* tekton.dev */ {
       resourceRef: PipelineResourceRef;
       resultType: string; // typed in Go as `type ResultType string`
 
-      constructor(fields?: Partial<PipelineResourceResult>) {
+      constructor(fields: PipelineResourceResult) {
         Object.assign(this, fields);
       }
     }
 
     // https://github.com/tektoncd/pipeline/blob/v0.11.0-rc1/pkg/apis/pipeline/v1beta1/resource_types.go#L122
     export class PipelineResourceRef {
-      constructor(public name: string, fields?: Partial<PipelineResourceRef>) {
+      name: string;
+      apiVersion?: string;
+
+      constructor(fields: PipelineResourceRef) {
         Object.assign(this, fields);
       }
-
-      apiVersion?: string;
     }
 
     // Task types (task_types.go)
@@ -482,7 +485,7 @@ export namespace tekton /* tekton.dev */ {
       metadata?: meta.v1.ObjectMeta;
       spec?: TaskSpec;
 
-      constructor(name: string, fields?: Partial<Task>) {
+      constructor(name: string, fields: Task) {
         Object.assign(this, fields);
         this.metadata = Object.assign(this.metadata || {}, { name });
       }
@@ -499,25 +502,26 @@ export namespace tekton /* tekton.dev */ {
       workspaces?: WorkspaceDeclaration[];
       results?: TaskResult[];
 
-      constructor(fields?: Partial<TaskSpec>) {
+      constructor(fields: TaskSpec) {
         Object.assign(this, fields);
       }
     }
 
     // https://github.com/tektoncd/pipeline/blob/v0.11.0-rc1/pkg/apis/pipeline/v1beta1/task_types.go#L94
     export class TaskResult {
-      constructor(public name: string, fields?: Partial<TaskResult>) {
+      public name: string;
+      description?: string;
+
+      constructor(fields: TaskResult) {
         Object.assign(this, fields);
       }
-
-      description?: string;
     }
 
     // https://github.com/tektoncd/pipeline/blob/v0.11.0-rc1/pkg/apis/pipeline/v1beta1/task_types.go#L105
     export class Step extends core.v1.Container {
       script?: string;
 
-      constructor(fields?: Partial<Step>) {
+      constructor(fields: Step) {
         super();
         Object.assign(this, fields);
       }
@@ -546,7 +550,7 @@ export namespace tekton /* tekton.dev */ {
       kind: TaskKind;
       apiVersion?: string;
 
-      constructor(fields?: Partial<TaskRef>) {
+      constructor(fields: TaskRef) {
         Object.assign(this, fields);
       }
     }
@@ -564,7 +568,7 @@ export namespace tekton /* tekton.dev */ {
       podTemplate: PodTemplate;
       workspaces?: WorkspaceBinding[];
 
-      constructor(fields?: Partial<TaskRunSpec>) {
+      constructor(fields: TaskRunSpec) {
         Object.assign(this, fields);
       }
     }
@@ -577,7 +581,7 @@ export namespace tekton /* tekton.dev */ {
       resources?: TaskResourceBinding[];
       params?: Param[];
 
-      constructor(fields?: Partial<TaskRunImports>) {
+      constructor(fields: TaskRunImports) {
         Object.assign(this, fields);
       }
     }
@@ -587,8 +591,8 @@ export namespace tekton /* tekton.dev */ {
     export class TaskResourceBinding extends PipelineResourceBinding {
       paths?: string[]; // due to be removed
 
-      constructor(fields?: Partial<PipelineResourceBinding>) {
-        super();
+      constructor(fields: PipelineResourceBinding) {
+        super(fields);
         Object.assign(this, fields);
       }
     }
@@ -597,7 +601,7 @@ export namespace tekton /* tekton.dev */ {
     export class TaskRunOutputs {
       resources?: TaskResourceBinding[];
 
-      constructor(fields?: Partial<TaskRunOutputs>) {
+      constructor(fields: TaskRunOutputs) {
         Object.assign(this, fields);
       }
     }
@@ -621,7 +625,7 @@ export namespace tekton /* tekton.dev */ {
       spec?: TaskRunSpec;
       // omitted: status
 
-      constructor(name: string, fields?: Partial<TaskRun>) {
+      constructor(name: string, fields: TaskRun) {
         Object.assign(this, fields);
         this.metadata = Object.assign(this.metadata || {}, { name });
       }
@@ -645,7 +649,7 @@ export namespace tekton /* tekton.dev */ {
       mountPath?: string;
       readOnly?: boolean;
 
-      constructor(fields?: Partial<WorkspaceDeclaration>) {
+      constructor(fields: WorkspaceDeclaration) {
         Object.assign(this, fields);
       }
     }
@@ -659,7 +663,7 @@ export namespace tekton /* tekton.dev */ {
       configMap?: core.v1.ConfigMapVolumeSource;
       secret?: core.v1.SecretVolumeSource;
 
-      constructor(fields?: Partial<WorkspaceBinding>) {
+      constructor(fields: WorkspaceBinding) {
         if (fields && fields.persistentVolumeClaim && fields.emptyDir) {
           throw new Error('cannot construct WorkspaceBinding with both persistentVolumeClaim and emptyDir; pick one');
         }
@@ -672,7 +676,7 @@ export namespace tekton /* tekton.dev */ {
       name: string;
       description?: string;
 
-      constructor(fields?: Partial<WorkspacePipelineDeclaration>) {
+      constructor(fields: WorkspacePipelineDeclaration) {
         Object.assign(this, fields);
       }
     }
@@ -682,7 +686,7 @@ export namespace tekton /* tekton.dev */ {
       name: string;
       workspace: string;
 
-      constructor(fields?: Partial<WorkspacePipelineTaskBinding>) {
+      constructor(fields: WorkspacePipelineTaskBinding) {
         Object.assign(this, fields);
       }
     }
