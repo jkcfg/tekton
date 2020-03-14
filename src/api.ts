@@ -27,7 +27,12 @@ transliterating them to TypeScript.
    `inline` (e.g., TaskResource embeds ResourceDeclaration); I have
    made the class corresponding to the outer struct extend the
    other. The exception is meta.v1.TypeMeta, which I have just inlined
-   myself.
+   myself
+
+ - speaking of which, the inlined TypeMeta fields `kind` and
+   `apiVersion` are readonly and optional, the latter because I don't
+   want them to be required in the `fields` argument of the
+   constructor
 
  - Status fields and types are omitted, on the basis that they are
    reported by the runtime system rather than defined in
@@ -100,8 +105,8 @@ export namespace tekton /* tekton.dev */ {
 
     // https://github.com/tektoncd/pipeline/blob/v0.11.0-rc1/pkg/apis/resource/v1alpha1/pipeline_resource_types.go#L73
     export class PipelineResource {
-      readonly apiVersion: string = version;
-      readonly kind: string = "PipelineResource";
+      readonly apiVersion?: string = version;
+      readonly kind?: string = "PipelineResource";
       metadata?: meta.v1.ObjectMeta;
       spec: PipelineResourceSpec;
       // omitted: status, which is decrecated anyway
@@ -150,8 +155,8 @@ export namespace tekton /* tekton.dev */ {
 
     // https://github.com/tektoncd/pipeline/blob/v0.11.0-rc1/pkg/apis/resource/v1alpha1/pipeline_resource_types.go#L147
     export class PipelineResourceList {
-      readonly apiVersion: string = version;
-      readonly kind: string = "PipelineResourceList";
+      readonly apiVersion?: string = version;
+      readonly kind?: string = "PipelineResourceList";
       metadata?: meta.v1.ListMeta;
 
       constructor(public items: PipelineResource[]) {}
@@ -164,8 +169,8 @@ export namespace tekton /* tekton.dev */ {
 
     // https://github.com/tektoncd/pipeline/blob/v0.11.0-rc1/pkg/apis/pipeline/v1beta1/cluster_task_types.go#L31
     export class ClusterTask {
-      readonly apiVersion: string = version;
-      readonly kind: string = "ClusterTask";
+      readonly apiVersion?: string = version;
+      readonly kind?: string = "ClusterTask";
       metadata?: meta.v1.ObjectMeta;
       spec?: TaskSpec;
 
@@ -176,8 +181,8 @@ export namespace tekton /* tekton.dev */ {
     }
 
     export class ClusterTaskList {
-      readonly apiVersion: string = version;
-      readonly kind: string = "ClusterTaskList";
+      readonly apiVersion?: string = version;
+      readonly kind?: string = "ClusterTaskList";
       metadata?: meta.v1.ListMeta;
 
       constructor(public items: ClusterTask[]) {}
@@ -212,8 +217,8 @@ export namespace tekton /* tekton.dev */ {
 
     // https://github.com/tektoncd/pipeline/blob/v0.11.0-rc1/pkg/apis/pipeline/v1beta1/pipeline_types.go#L31
     export class Pipeline {
-      readonly apiVersion: string = version;
-      readonly kind: string = "Pipeline";
+      readonly apiVersion?: string = version;
+      readonly kind?: string = "Pipeline";
       metadata?: meta.v1.ObjectMeta;
       spec?: PipelineSpec;
       // omitted: status is deprecated
@@ -305,8 +310,8 @@ export namespace tekton /* tekton.dev */ {
 
     // https://github.com/tektoncd/pipeline/blob/v0.11.0-rc1/pkg/apis/pipeline/v1beta1/pipeline_types.go#L217
     export class PipelineList {
-      readonly apiVersion: string = version;
-      readonly kind: string = "PipelineList";
+      readonly apiVersion?: string = version;
+      readonly kind?: string = "PipelineList";
       metadata?: meta.v1.ListMeta;
 
       constructor(public items: Pipeline[]) {}
@@ -316,8 +321,8 @@ export namespace tekton /* tekton.dev */ {
 
     // https://github.com/tektoncd/pipeline/blob/v0.11.0-rc1/pkg/apis/pipeline/v1beta1/pipelinerun_types.go#L50
     export class PipelineRun {
-      readonly apiVersion: string = version;
-      readonly kind: string = "PipelineRun";
+      readonly apiVersion?: string = version;
+      readonly kind?: string = "PipelineRun";
       metadata?: meta.v1.ObjectMeta;
       spec?: PipelineRunSpec;
       // omitted: status
@@ -375,8 +380,8 @@ export namespace tekton /* tekton.dev */ {
 
     // https://github.com/tektoncd/pipeline/blob/v0.11.0-rc1/pkg/apis/pipeline/v1beta1/pipelinerun_types.go#L273
     export class PipelineRunList {
-      readonly apiVersion: string = version;
-      readonly kind: string = "PipelineRunList";
+      readonly apiVersion?: string = version;
+      readonly kind?: string = "PipelineRunList";
       meta?: meta.v1.ListMeta;
       constructor(public items: PipelineRun[]) {}
     }
@@ -480,8 +485,8 @@ export namespace tekton /* tekton.dev */ {
 
     // https://github.com/tektoncd/pipeline/blob/v0.11.0-rc1/pkg/apis/pipeline/v1beta1/task_types.go#L34
     export class Task {
-      readonly apiVersion: string = version;
-      readonly kind: string = "Task";
+      readonly apiVersion?: string = version;
+      readonly kind?: string = "Task";
       metadata?: meta.v1.ObjectMeta;
       spec?: TaskSpec;
 
@@ -532,8 +537,8 @@ export namespace tekton /* tekton.dev */ {
 
     // https://github.com/tektoncd/pipeline/blob/v0.11.0-rc1/pkg/apis/pipeline/v1beta1/task_types.go#L119
     export class TaskList {
-      readonly apiVersion: string = version;
-      readonly kind: string = "TaskList";
+      readonly apiVersion?: string = version;
+      readonly kind?: string = "TaskList";
       metadata: meta.v1.ListMeta;
 
       constructor(public items: Task[]) {}
@@ -619,8 +624,8 @@ export namespace tekton /* tekton.dev */ {
 
     // https://github.com/tektoncd/pipeline/blob/v0.11.0-rc1/pkg/apis/pipeline/v1beta1/taskrun_types.go#L247
     export class TaskRun {
-      readonly apiVersion: string = version;
-      readonly kind: string = "TaskRun";
+      readonly apiVersion?: string = version;
+      readonly kind?: string = "TaskRun";
       metadata?: meta.v1.ObjectMeta;
       spec?: TaskRunSpec;
       // omitted: status
@@ -633,8 +638,8 @@ export namespace tekton /* tekton.dev */ {
 
     // https://github.com/tektoncd/pipeline/blob/v0.11.0-rc1/pkg/apis/pipeline/v1beta1/taskrun_types.go#L261
     export class TaskRunList {
-      readonly apiVersion: string = version;
-      readonly kind: string = "TaskRunList";
+      readonly apiVersion?: string = version;
+      readonly kind?: string = "TaskRunList";
       metadata?: meta.v1.ListMeta;
 
       constructor(public items: TaskRun[]) {}
