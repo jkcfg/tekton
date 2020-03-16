@@ -8,7 +8,7 @@ const t = new tekton.v1beta1.Task('say-hello', {
       name: 'say',
       image: 'alpine',
       command: ['/bin/echo'],
-      args: ['Hello ${inputs.params.who}'],
+      args: ['Hello $(inputs.params.who)'],
     }],
   }),
 });

@@ -5,3 +5,10 @@
 This repository contains a library for constructing
 [Tekton](https://github.com/tektoncd) objects -- pipelines, tasks and
 so on.
+
+## Examples
+
+ - [examples/helloworld](./examples/helloworld/) -- a definition of a
+   pipeline in JavaScript
+ - [examples/typescript](./examples/typescript/) -- a definition of a
+   pipeline in TypeScript
